@@ -2,6 +2,8 @@
 
 Welcome to my comprehensive portfolio repository! This is a unified collection of all my programming projects, organized by technology and purpose.
 
+> **📋 For complete details, see [PORTFOLIO_OVERVIEW.md](./PORTFOLIO_OVERVIEW.md)**
+
 ## � Project Structure
 
 This repository contains the following projects, each in its own dedicated folder:

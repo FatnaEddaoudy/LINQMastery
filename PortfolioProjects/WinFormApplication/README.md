@@ -1,53 +1,47 @@
-# Windows Forms Application
+# WinForm Applications Collection
 
-## 📝 Description
-Desktop applications built using Windows Forms in C#, demonstrating various UI components and functionality.
+This repository contains a collection of Windows Forms applications developed in C#.
 
-## 🛠️ Technologies Used
-- C#
-- .NET Framework / .NET Core
-- Windows Forms
-- Visual Studio
-- [Add other components]
+## Applications
 
-## 🚀 Features
-- Desktop GUI applications
-- Database integration
-- File operations
-- User management
-- [Add more features]
+### 1. Inventory System (`InventorySystem/`)
+A complete inventory management system built with Windows Forms that allows users to:
+- Manage stock items
+- Track inventory levels
+- Handle stock returns
+- Configure system settings
+- User authentication
 
-## 📦 Installation
-```bash
-# Prerequisites
-- .NET Framework 4.7.2 or higher
-- Visual Studio 2019 or later
+### 2. Member Management System (`MemberManagementSystem/`)
+A simple member management application that provides:
+- Member registration and management
+- Member data tracking
+- User-friendly interface for member operations
 
-# Build and run
-1. Open the solution file (.sln) in Visual Studio
-2. Build the solution (Ctrl+Shift+B)
-3. Run the application (F5)
-```
+## Prerequisites
+- .NET 9.0 or later
+- Windows Operating System
+- Visual Studio 2022 (recommended)
 
-## 💻 Usage
-[Add usage instructions and examples]
+## Getting Started
 
-## 📸 Screenshots
-[Add screenshots of the applications]
+### Running the Inventory System
+1. Navigate to `InventorySystem/InventarySystem/`
+2. Open `InventarySystem.sln` in Visual Studio
+3. Build and run the project
 
-## 🏗️ Project Structure
-```
-WinFormApplication/
-├── App1/
-├── App2/
-└── SharedLibraries/
-```
+### Running the Member Management System
+1. Navigate to `MemberManagementSystem/Simple Member Management System/`
+2. Open `Simple Member Management System.sln` in Visual Studio
+3. Build and run the project
 
-## 🤝 Contributing
-Instructions for contributing to this project.
+## Development
 
-## 📄 License
-[Add license information]
+Each application is self-contained with its own solution file and project structure. Both applications are built using:
+- Windows Forms (.NET 9.0)
+- C# programming language
+- Visual Studio project structure
 
----
-**Part of [PortfolioProjects](../) collection**
+## License
+
+This project is open source and available under the MIT License.

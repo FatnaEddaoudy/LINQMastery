@@ -1,0 +1,52 @@
+# Build outputs
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.user
+*.suo
+*.cache
+*.log
+
+# Visual Studio files
+.vs/
+*.sln.docstates
+*.userprefs
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Package files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Dependencies
+packages/
+node_modules/
+
+# IDE files
+*.swp
+*.swo
+*~
+
+# App specific
+*.config.user
+*.dll.config
