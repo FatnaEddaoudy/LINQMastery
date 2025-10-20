@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CV Matcher</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin:20px; max-width:1000px; }
+    .row { display:flex; gap:16px; flex-wrap:wrap; }
+    .col { flex:1 1 300px; min-width:280px; }
+    label { display:block; margin-bottom:6px; font-weight:600; }
+    input[type="file"] { margin-bottom:8px; }
+    textarea { width:100%; height:140px; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; }
+    th,td { border:1px solid #ddd; padding:8px; text-align:left; }
+    th { background:#f6f6f6; }
+    .controls { display:flex; gap:8px; align-items:center; margin-top:8px; }
+    .btn { padding:8px 12px; background:#0078d4; color:#fff; border:none; cursor:pointer; border-radius:4px; }
+    .btn.secondary { background:#666; }
+    pre.trace { background:#111; color:#fff; padding:12px; overflow:auto; max-height:300px; }
+  </style>
+</head>
+<body>
+  <h1>CV Matcher</h1>
+
+  {% if error %}
+    <h2 style="color:crimson">Error</h2>
+    <pre class="trace">{{ error }}</pre>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    <div class="row">
+      <div class="col">
+        <label for="job_text">Job description (paste)</label>
+        <textarea name="job_text" id="job_text">{{ job_text or "" }}</textarea>
+        <label for="job_file">or upload job file (txt)</label>
+        <input type="file" name="job_file" id="job_file" accept=".txt,.pdf,.docx" />
+      </div>
+
+      <div class="col">
+        <label for="cvs">Upload CV files (multiple)</label>
+        <input type="file" name="cvs" id="cvs" multiple accept=".txt,.pdf,.docx" />
+        <label for="cv_text">or paste single CV text</label>
+        <textarea name="cv_text" id="cv_text" placeholder="Optional: paste a CV here"></textarea>
+
+        <div style="margin-top:12px">
+          <label>Scoring weights</label>
+          <div class="controls">
+            <label>Embedding <input type="number" step="0.05" min="0" max="1" name="emb_w" value="{{ emb_w|default(0.7) }}"></label>
+            <label>Keywords <input type="number" step="0.05" min="0" max="1" name="kw_w" value="{{ kw_w|default(0.3) }}"></label>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <button class="btn" type="submit">Run matching</button>
+          <button class="btn secondary" type="submit" name="download" value="1">Download CSV</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  {% if results %}
+    <h2>Results</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Filename</th>
+          <th>Embedding %</th>
+          <th>Keyword %</th>
+          <th>Combined %</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for r in results %}
+        <tr>
+          <td>{{ r.filename }}</td>
+          <td>{{ r.embedding_score|default('') }}</td>
+          <td>{{ r.keyword_overlap|default('') }}</td>
+          <td>{{ r.combined_percent|default('') }}</td>
+          <td>{{ r.score|default('') }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  <hr/>
+  <p style="font-size:0.9em;color:#666">If you still get HTTP 500 after this, open a PowerShell terminal, keep the Flask server running, then run:</p>
+  <pre>
+# in a new PS window (venv activate if needed)
+python .\tools\post_test.py
+
+# if 500, fetch last traceback from server log:
+Get-Content .\logs\webapp_error.log -Tail 200
+  </pre>
+</body>
+</html>
