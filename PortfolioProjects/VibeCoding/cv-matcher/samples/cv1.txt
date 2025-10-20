@@ -1,1 +1,0 @@
-Alice Example\n\nSenior Software Engineer with 6 years experience. Languages: Python, JavaScript. Experience with machine learning and data preprocessing. Worked with scikit-learn and PyTorch in research projects. Familiar with Docker and AWS. Excellent at collaborating across teams.

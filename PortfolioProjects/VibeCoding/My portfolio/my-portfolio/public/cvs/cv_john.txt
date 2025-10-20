@@ -1,1 +1,0 @@
-John Doe\nSoftware Engineer focusing on frontend React apps and UX.\nSkills: JavaScript, React, CSS, HTML, TypeScript.\nExperience: Delivered SPA projects, performance optimizations, component libraries.\nEducation: BSc Information Technology.

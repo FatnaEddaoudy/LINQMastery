@@ -1,36 +1,10 @@
-# VibeCoding Project
+# Vibe Coding
 
-## 📝 Description
-This project showcases [add description of VibeCoding project].
+This repository contains my coding projects.
 
-## 🛠️ Technologies Used
-- [Add technologies used]
-- [Add frameworks]
-- [Add tools]
+## Projects
 
-## 🚀 Features
-- [Feature 1]
-- [Feature 2]
-- [Feature 3]
+- **[pizza-ordering-system/](./pizza-ordering-system/)** - Complete pizza ordering system with React and C# ASP.NET Core
+- **[FileTransform/](./FileTransform/)** - File transformation utilities
 
-## 📦 Installation
-```bash
-# Add installation instructions
-```
-
-## 💻 Usage
-```bash
-# Add usage examples
-```
-
-## 📸 Screenshots
-[Add screenshots or demo links]
-
-## 🤝 Contributing
-Instructions for contributing to this project.
-
-## 📄 License
-[Add license information]
-
----
-**Part of [PortfolioProjects](../) collection**
+Each project contains its own documentation and setup instructions.
