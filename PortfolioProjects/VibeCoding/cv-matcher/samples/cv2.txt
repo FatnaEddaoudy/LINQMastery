@@ -1,0 +1,1 @@
+Bob Candidate\n\nFull-stack developer mostly focused on frontend technologies (React, TypeScript). Some backend experience with Python and Node.js. Used Docker for local setups. No direct ML experience.

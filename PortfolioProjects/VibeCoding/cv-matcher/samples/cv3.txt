@@ -1,0 +1,1 @@
+Carol ML Engineer\n\nMachine learning engineer with 4 years of experience. Strong NLP background, deployed models to AWS, used TensorFlow and scikit-learn, built data preprocessing pipelines and Dockerized services.

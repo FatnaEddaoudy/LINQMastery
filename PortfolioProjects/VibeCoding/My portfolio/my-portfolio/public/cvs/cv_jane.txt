@@ -1,0 +1,1 @@
+Jane Smith\nData Scientist with experience in Python, machine learning, and data visualization.\nSkills: Python, pandas, scikit-learn, SQL, statistics, model deployment.\nExperience: Built predictive models, dashboards, and data pipelines.\nEducation: MSc Data Science.
