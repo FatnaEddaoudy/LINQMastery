@@ -1,4 +1,4 @@
-# LINQ Mastery
+# LINQMastery
 
 A comprehensive collection of LINQ (Language Integrated Query) exercises and examples in C#. This repository contains various projects demonstrating different aspects of LINQ functionality, from basic queries to advanced operations.
 
