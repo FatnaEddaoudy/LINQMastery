@@ -1,0 +1,81 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #27374D;
+  color: #DDE6ED;
+}
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+.container{
+  width: 100%;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  box-sizing:border-box;
+}
+
+.main{
+  width: 20%;
+  flex: 1;
+  margin-right: 3%;
+  padding: 0;
+  background-origin: padding-box;
+}
+.inhoud{
+  width: 80%;
+  margin-right: 3%;
+  padding: 0;
+  background-origin: padding-box;
+}
+.menu {
+  background-color: #526D82;
+  border:solid #526D82;
+  list-style: none;
+  padding: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  z-index: 1000;
+  height: 100vh;  
+  width: 220px;
+ 
+}
+
+a:link, a:visited {
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.menu > ul{
+  padding: 0;
+  margin: 0;
+}
+.menu > ul > li {
+  background-color: #9DB2BF;
+  margin: 10px 0;
+  padding: 20px 0;
+  border: 1px solid #ccc;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  background-origin: padding-box;
+}
+.menu li:hover {
+  background-color: #d0d0d0;
+}
+.menu >a{
+  color: #333;
+  font-weight: bold;
+  display: block; 
+}
+
+.icone{
+  width: 40px;
+}
+
