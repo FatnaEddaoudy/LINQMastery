@@ -56,7 +56,7 @@ VibeCoding/                    # ✅ 136+ Python ML & portfolio projects
 ├── cv-matcher/               # Python Flask application
 └── My portfolio/             # React portfolio websites
 
-React-Portfolio/               # ✅ 75+ React applications
+React/                         # ✅ 75+ React applications
 ├── MemeGenerator/            # React meme creation app
 ├── library-website/          # Library management system
 └── mijnportfolio/            # Personal portfolio site
