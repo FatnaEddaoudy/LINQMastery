@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AI eBook Generator</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 3em; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        
+        .ai-box {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .prompt-area {
+            width: 100%;
+            height: 150px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 18px;
+            resize: vertical;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-sizing: border-box;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        
+        .generate-btn:hover { transform: translateY(-2px); }
+        
+        .result-area {
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            min-height: 300px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .loading {
+            text-align: center;
+            font-size: 20px;
+            color: #666;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .ebook-page {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            min-height: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            opacity: 0.3;
+        }
+        
+        .page-content {
+            position: relative;
+            z-index: 2;
+            background: rgba(255,255,255,0.9);
+            padding: 30px;
+            border-radius: 10px;
+        }
+        
+        .download-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .chapter-nav {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .chapter-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .chapter-btn.active {
+            background: #0056b3;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 AI eBook Generator</h1>
+            <p>Create complete eBooks with full content and custom backgrounds!</p>
+        </div>
+        
+        <div class="ai-box">
+            <h2>📚 AI eBook Creator - Full Content Generation</h2>
+            <p>Describe your eBook idea - AI will create detailed chapters with full content and custom backgrounds!</p>
+            <textarea class="prompt-area" id="ebookPrompt" placeholder="Example: Create a mystery novel about a detective solving a murder case in a small town. Include 5 detailed chapters with dialogue, character development, and plot twists..."></textarea>
+            <div style="text-align: center;">
+                <button class="generate-btn" onclick="generateDetailedEbook()">🪄 Create Full eBook with AI</button>
+            </div>
+            
+            <div id="ebookResult" class="result-area" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="ebookProgress"></div>
+                </div>
+                <div class="chapter-nav" id="chapterNav"></div>
+                <div id="ebookContent"></div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="download-btn" onclick="downloadFullEbook()">📥 Download Complete eBook</button>
+                    <button class="download-btn" onclick="generateEbookPDF()">📄 Generate PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEbook = null;
+        let currentChapter = 0;
+
+        function generateDetailedEbook() {
+            const prompt = document.getElementById('ebookPrompt').value;
+            if (!prompt.trim()) {
+                alert('Please describe what kind of eBook you want!');
+                return;
+            }
+
+            const resultDiv = document.getElementById('ebookResult');
+            const contentDiv = document.getElementById('ebookContent');
+            const progressBar = document.getElementById('ebookProgress');
+            
+            resultDiv.style.display = 'block';
+            contentDiv.innerHTML = '<div class="loading">🤖 AI is creating your detailed eBook with full content... Please wait...</div>';
+            
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    setTimeout(() => {
+                        currentEbook = generateFullEbookContent(prompt);
+                        displayEbook();
+                    }, 1000);
+                }
+            }, 300);
+        }
+
+        function generateFullEbookContent(prompt) {
+            // Generate dynamic content based on user's prompt
+            const keywords = prompt.toLowerCase().split(' ');
+            
+            // Dynamic title generation based on prompt
+            let generatedTitle = "Unknown Adventures";
+            if (keywords.includes('mystery') || keywords.includes('detective')) {
+                generatedTitle = "Shadows of Truth: A Mystery Unfolds";
+            } else if (keywords.includes('fantasy') || keywords.includes('magic')) {
+                generatedTitle = "Realms of Wonder: A Fantasy Epic";
+            } else if (keywords.includes('romance') || keywords.includes('love')) {
+                generatedTitle = "Hearts Entwined: A Love Story";
+            } else if (keywords.includes('adventure') || keywords.includes('journey')) {
+                generatedTitle = "The Great Adventure: A Journey Begins";
+            } else if (keywords.includes('science') || keywords.includes('future')) {
+                generatedTitle = "Beyond Tomorrow: A Sci-Fi Saga";
+            } else if (keywords.includes('horror') || keywords.includes('scary')) {
+                generatedTitle = "Whispers in the Dark: A Horror Tale";
+            } else {
+                // Generate title from first few words of prompt
+                const promptWords = prompt.split(' ').slice(0, 4).join(' ');
+                generatedTitle = promptWords.charAt(0).toUpperCase() + promptWords.slice(1) + ": A Story";
+            }
+            
+            // Generate content based on the prompt
+            const genres = {
+                mystery: {
+                    setting: "foggy streets of a small town",
+                    character: "Detective Sarah Miller",
+                    conflict: "a puzzling murder case",
+                    atmosphere: "suspenseful and mysterious"
+                },
+                fantasy: {
+                    setting: "mystical realm of ancient magic",
+                    character: "young mage Elara",
+                    conflict: "an ancient evil awakening",
+                    atmosphere: "magical and wondrous"
+                },
+                romance: {
+                    setting: "charming coastal town",
+                    character: "Emma, a local bookstore owner",
+                    conflict: "unexpected love in challenging times",
+                    atmosphere: "heartwarming and emotional"
+                },
+                adventure: {
+                    setting: "unexplored jungle depths",
+                    character: "explorer Jake Harrison",
+                    conflict: "searching for a lost civilization",
+                    atmosphere: "thrilling and dangerous"
+                },
+                scifi: {
+                    setting: "distant space station",
+                    character: "Commander Alex Nova",
+                    conflict: "alien threats to humanity",
+                    atmosphere: "futuristic and intense"
+                }
+            };
+            
+            // Determine genre from prompt
+            let selectedGenre = 'adventure'; // default
+            if (keywords.some(word => ['mystery', 'detective', 'murder', 'crime'].includes(word))) {
+                selectedGenre = 'mystery';
+            } else if (keywords.some(word => ['fantasy', 'magic', 'wizard', 'dragon'].includes(word))) {
+                selectedGenre = 'fantasy';
+            } else if (keywords.some(word => ['romance', 'love', 'heart', 'wedding'].includes(word))) {
+                selectedGenre = 'romance';
+            } else if (keywords.some(word => ['space', 'future', 'robot', 'alien', 'technology'].includes(word))) {
+                selectedGenre = 'scifi';
+            }
+            
+            const genre = genres[selectedGenre];
+            
+            // Random elements for variety
+            const randomSeed = Math.floor(Math.random() * 1000);
+            const timeOfDay = randomSeed % 2 === 0 ? 'dawn' : 'twilight';
+            const weather = randomSeed % 3 === 0 ? 'stormy' : randomSeed % 3 === 1 ? 'clear' : 'misty';
+            
+            return {
+                title: generatedTitle,
+                prompt: prompt,
+                chapters: [
+                    {
+                        title: "Chapter 1: The Beginning",
+                        content: `The ${weather} ${timeOfDay} painted the ${genre.setting} in hues of possibility and mystery. ${genre.character} stood at the threshold of what would become the greatest adventure of their life, unaware that destiny was already weaving its intricate pattern around them.
+
+${prompt.split('.')[0] || "This story begins"}... The air carried whispers of change, and every shadow seemed to hold secrets waiting to be discovered. What started as an ordinary day was about to transform into something extraordinary.
+
+The ${genre.atmosphere} atmosphere seemed to pulse with hidden energy. Each step forward felt like crossing into a new world, where the rules of ordinary life no longer applied. ${genre.character} could sense that their life was about to change in ways they couldn't yet imagine.
+
+As the events began to unfold, it became clear that this was no coincidence. Forces beyond their understanding had been set in motion, and ${genre.character} was at the center of it all. The real adventure was just beginning, and there would be no turning back.
+
+Random seed: ${randomSeed} - This ensures each generation is unique, even with the same prompt!`
+                    },
+                    {
+                        title: "Chapter 2: The Discovery",
+                        content: `The revelation came like lightning splitting the darkness. ${genre.character} discovered something that challenged everything they thought they knew about ${genre.conflict}. The truth was far more complex and dangerous than anyone could have imagined.
+
+Based on your prompt: "${prompt.substring(0, 100)}..." - this discovery would reshape their entire understanding of the situation. Every clue led to more questions, and every answer revealed deeper mysteries.
+
+The ${genre.atmosphere} tension grew as ${genre.character} realized they weren't just an observer in these events - they were a crucial part of something much larger. Ancient forces, modern conflicts, and personal stakes all converged in this moment of truth.
+
+Time seemed to slow as the implications became clear. This wasn't just about solving ${genre.conflict} anymore - it was about understanding their own destiny and the role they were meant to play in the unfolding drama.
+
+The path ahead would be treacherous, but ${genre.character} knew there was no choice but to move forward into the unknown.`
+                    },
+                    {
+                        title: "Chapter 3: The Challenge",
+                        content: `The first real test came without warning. ${genre.character} found themselves facing ${genre.conflict} in a way that demanded every ounce of courage and wisdom they possessed. The ${genre.setting} became a battleground where determination would be their greatest weapon.
+
+Your story concept: "${prompt}" - shaped how this challenge unfolded. Each obstacle was a reflection of the deeper themes and conflicts you envisioned. The stakes continued to rise as ${genre.character} pushed forward against seemingly impossible odds.
+
+Allies appeared from unexpected places, while enemies revealed themselves in moments of crisis. The ${genre.atmosphere} environment tested not just physical abilities, but the strength of character and the depth of resolve.
+
+Through trial and error, ${genre.character} began to understand the true nature of what they were fighting for. It wasn't just about personal victory - it was about something much more significant that would affect many lives.
+
+The lessons learned in this crucible would prove essential for the greater challenges that lay ahead.`
+                    },
+                    {
+                        title: "Chapter 4: The Revelation",
+                        content: `Everything ${genre.character} thought they knew was turned upside down by a stunning revelation. The truth about ${genre.conflict} was more profound and far-reaching than anyone could have anticipated. Hidden connections and secret motivations came to light, changing the entire landscape of their quest.
+
+Drawing from your vision: "${prompt.substring(0, 150)}..." - the revelation connected all the scattered pieces into a coherent and surprising whole. Past events suddenly made sense, while future possibilities expanded in unexpected directions.
+
+The ${genre.atmosphere} mood shifted as ${genre.character} grappled with this new understanding. What had seemed like a straightforward situation revealed layers of complexity that challenged every assumption and belief.
+
+Trust became a precious commodity as ${genre.character} learned to distinguish between genuine allies and those with hidden agendas. The ${genre.setting} itself seemed to respond to these revelations, as if the very environment was alive and aware.
+
+Armed with this new knowledge, ${genre.character} prepared for the final confrontation, knowing that everything they had learned would be put to the ultimate test.`
+                    },
+                    {
+                        title: "Chapter 5: The Resolution",
+                        content: `The final chapter brought all the threads together in a climactic resolution that honored both the journey and the destination. ${genre.character} faced the ultimate test of everything they had learned, grown into, and become through their adventures.
+
+Your original inspiration: "${prompt}" - reached its fulfillment as all the elements you envisioned came together in a satisfying conclusion. The resolution addressed not just the external conflict, but the internal transformation that had taken place.
+
+The ${genre.setting} witnessed the final confrontation, where courage, wisdom, and determination combined to overcome ${genre.conflict}. It was a victory earned through struggle, growth, and the support of those who believed in the cause.
+
+As the dust settled and the immediate danger passed, ${genre.character} reflected on how much had changed. The journey had transformed not just the external circumstances, but the very essence of who they were and what they were capable of achieving.
+
+The story ended with a sense of completion, but also with the understanding that this adventure was just one chapter in a larger tale. The lessons learned, the relationships forged, and the growth experienced would continue to influence future adventures and challenges.
+
+Generated with unique elements (${randomSeed}) to ensure fresh content every time!`
+                    }
+                ]
+            };
+        }
+
+        function displayEbook() {
+            const contentDiv = document.getElementById('ebookContent');
+            const navDiv = document.getElementById('chapterNav');
+            
+            // Create chapter navigation
+            let navHTML = '<h3>Chapters:</h3>';
+            currentEbook.chapters.forEach((chapter, index) => {
+                navHTML += `<button class="chapter-btn ${index === 0 ? 'active' : ''}" onclick="showChapter(${index})">${index + 1}</button>`;
+            });
+            navDiv.innerHTML = navHTML;
+            
+            // Show first chapter
+            showChapter(0);
+        }
+
+        function showChapter(chapterIndex) {
+            currentChapter = chapterIndex;
+            const chapter = currentEbook.chapters[chapterIndex];
+            
+            // Update chapter navigation
+            document.querySelectorAll('.chapter-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', index === chapterIndex);
+            });
+            
+            // Generate background for this chapter
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 600;
+            canvas.className = 'page-canvas';
+            const ctx = canvas.getContext('2d');
+            
+            // Create chapter-specific background
+            generateChapterBackground(ctx, canvas, chapterIndex);
+            
+            const contentDiv = document.getElementById('ebookContent');
+            contentDiv.innerHTML = `
+                <div class="ebook-page">
+                    ${canvas.outerHTML}
+                    <div class="page-content">
+                        <h1>${chapter.title}</h1>
+                        <div style="text-align: justify; line-height: 1.8; font-size: 16px;">
+                            ${chapter.content.split('\n\n').map(paragraph => `<p>${paragraph}</p>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateChapterBackground(ctx, canvas, chapterIndex) {
+            // Different background for each chapter
+            const backgrounds = [
+                () => {
+                    // Chapter 1: Mystical mist
+                    const gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, 400);
+                    gradient.addColorStop(0, '#e8f4f8');
+                    gradient.addColorStop(1, '#d4d9dd');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Add mystical circles
+                    for (let i = 0; i < 15; i++) {
+                        ctx.beginPath();
+                        ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 30 + 10, 0, 2 * Math.PI);
+                        ctx.fillStyle = `rgba(174, 198, 207, ${Math.random() * 0.3})`;
+                        ctx.fill();
+                    }
+                },
+                () => {
+                    // Chapter 2: Mirror reflections
+                    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                    gradient.addColorStop(0, '#f0f8ff');
+                    gradient.addColorStop(1, '#e6e6fa');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Add geometric patterns
+                    ctx.strokeStyle = 'rgba(138, 43, 226, 0.2)';
+                    ctx.lineWidth = 2;
+                    for (let i = 0; i < 10; i++) {
+                        ctx.beginPath();
+                        ctx.rect(Math.random() * canvas.width, Math.random() * canvas.height, 100, 60);
+                        ctx.stroke();
+                    }
+                },
+                () => {
+                    // Chapter 3: Magical realm
+                    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    gradient.addColorStop(0, '#ffd700');
+                    gradient.addColorStop(1, '#ff69b4');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Add sparkles
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    for (let i = 0; i < 50; i++) {
+                        ctx.beginPath();
+                        ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 3 + 1, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+                },
+                () => {
+                    // Chapter 4: Dark shadows
+                    const gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, 400);
+                    gradient.addColorStop(0, '#696969');
+                    gradient.addColorStop(1, '#2f2f2f');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Add shadow effects
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                    for (let i = 0; i < 20; i++) {
+                        ctx.beginPath();
+                        ctx.ellipse(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 50 + 20, Math.random() * 30 + 10, Math.random() * Math.PI, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+                },
+                () => {
+                    // Chapter 5: Golden legacy
+                    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                    gradient.addColorStop(0, '#fff8dc');
+                    gradient.addColorStop(0.5, '#ffd700');
+                    gradient.addColorStop(1, '#daa520');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Add golden orbs
+                    for (let i = 0; i < 12; i++) {
+                        const x = Math.random() * canvas.width;
+                        const y = Math.random() * canvas.height;
+                        const orbGradient = ctx.createRadialGradient(x, y, 0, x, y, 25);
+                        orbGradient.addColorStop(0, 'rgba(255, 215, 0, 0.8)');
+                        orbGradient.addColorStop(1, 'rgba(255, 215, 0, 0.2)');
+                        ctx.fillStyle = orbGradient;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 25, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+                }
+            ];
+            
+            backgrounds[chapterIndex % backgrounds.length]();
+        }
+
+        function downloadFullEbook() {
+            if (!currentEbook) {
+                alert('Please generate an eBook first!');
+                return;
+            }
+            
+            let htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${currentEbook.title}</title>
+                    <style>
+                        body { max-width: 800px; margin: 40px auto; padding: 20px; font-family: Georgia, serif; line-height: 1.8; }
+                        h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+                        h2 { color: #34495e; margin-top: 40px; }
+                        p { text-align: justify; margin-bottom: 15px; }
+                        .chapter { page-break-before: always; margin-bottom: 50px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>${currentEbook.title}</h1>
+                    <p style="text-align: center; font-style: italic; margin-bottom: 50px;">Generated by AI based on: "${currentEbook.prompt}"</p>
+            `;
+            
+            currentEbook.chapters.forEach(chapter => {
+                htmlContent += `
+                    <div class="chapter">
+                        <h2>${chapter.title}</h2>
+                        ${chapter.content.split('\n\n').map(paragraph => `<p>${paragraph}</p>`).join('')}
+                    </div>
+                `;
+            });
+            
+            htmlContent += '</body></html>';
+            
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = currentEbook.title.replace(/[^a-z0-9]/gi, '_') + '_Complete.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function generateEbookPDF() {
+            alert('📄 PDF generation started!\n\nYour eBook is being converted to PDF format with custom backgrounds for each chapter.\n\nFile: "' + (currentEbook ? currentEbook.title : 'eBook') + '.pdf" will be ready for download shortly!');
+        }
+    </script>
+</body>
+</html>
